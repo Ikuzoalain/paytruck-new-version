@@ -1,0 +1,210 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Georgia", serif;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: white;
+}
+
+.navbar nav a {
+  margin-left: 30px;
+  text-decoration: none;
+  color: #7a8ca3;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.logo img {
+  height: 40px;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  height: 80vh;
+  background: url("IMM.png") center/cover no-repeat;
+  display: flex;
+  align-items: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.hero-content {
+  position: relative;
+  color: #fff;
+  max-width: 800px;
+  padding-left: 80px;
+}
+
+.hero-content h1 {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.hero-content p {
+  font-size: 22px;
+  margin-bottom: 30px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 14px 32px;
+  background: #6c87a8;
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-content {
+    padding: 40px;
+  }
+
+  .hero-content h1 {
+    font-size: 42px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+/* Admin Login Box */
+.login-box {
+  position: absolute;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  width: 300px;
+  border-radius: 8px;
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 12px;
+  background: #6c87a8;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.login-box button:hover {
+  background: #5a7696;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .login-box {
+    position: static;
+    /* Employee Registration Section */
+.employee-section {
+  padding: 80px 0;
+  background: #f2f2f2;
+}
+
+/* Form Card */
+.employee-form {
+  width: 420px;
+  margin: auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.employee-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Form Layout Fix */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* Buttons */
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.form-buttons button {
+  width: 30%;
+  padding: 8px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.save {
+  background: green;
+}
+
+.update {
+  background: blue;
+}
+
+.delete {
+  background: red;
+}
+.logout-btn{
+  margin-left:20px;
+  padding:5px 10px;
+  border:none;
+  border-radius:4px;
+  background:#d9534f;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+.logout-btn:hover{
+  background:#c9302c;
+}
+
+

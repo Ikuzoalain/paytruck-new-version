@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Partners in Growth</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f4f4;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      background: #111;
+    }
+
+    .navbar nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: bold;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      height: 100vh;
+      background: url("bg.jpg") no-repeat center center/cover;
+      display: flex;
+      align-items: center;
+      padding: 0 60px;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+    }
+
+    .hero-content {
+      position: relative;
+      color: white;
+      max-width: 500px;
+      z-index: 1;
+    }
+
+    .hero-content h1 {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .hero-content p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: #ff9800;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    /* Employee Form Box */
+    .login-box {
+      position: absolute;
+      right: 80px;
+      background: white;
+      padding: 25px;
+      width: 360px;
+      border-radius: 8px;
+      z-index: 1;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .login-box input[readonly] {
+      background: #eee;
+      cursor: not-allowed;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .form-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      background: #007bff;
+      color: white;
+    }
+
+    .form-actions .delete {
+      background: #d9534f;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="logo">
+      <img src="logo.png" alt="Logo" height="40" />
+    </div>
+    <nav>
+      <a href="#">HOME</a>
+      <a href="#">Admin Login</a>
+      <a href="#">Employee Login</a>
+      <a href="#">About Us</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="overlay"></div>
+
+    <div class="hero-content">
+      <h1>Your partners in growth.</h1>
+      <p>Build strategies, build confidence, build your business.</p>
+      <a href="#" class="btn">Learn More</a>
+    </div>
+
+    <!-- Employee Form -->
+    <div class="login-box">
+      <h2>Employee Form</h2>
+      <form id="employeeForm">
+
+        <input type="text" id="employeeId" placeholder="Employee ID" readonly />
+
+        <input type="text" placeholder="First Name" required />
+        <input type="text" placeholder="Second Name" required />
+        <input type="tel" placeholder="Telephone Number" required />
+        <input type="email" placeholder="Email" required />
+        <input type="text" placeholder="Department" required />
+        <input type="text" placeholder="Position" required />
+
+        <div class="form-actions">
+          <button type="submit">Save</button>
+          <button type="button">Update</button>
+          <button type="button" class="delete">Delete</button>
+        </div>
+
+      </form>
+    </div>
+
+  </section>
+
+  <script>
+    function generateEmployeeId() {
+      let lastNumber = localStorage.getItem("lastEmployeeNumber");
+
+      if (!lastNumber) {
+        lastNumber = 1;
+      } else {
+        lastNumber = parseInt(lastNumber) + 1;
+      }
+
+      localStorage.setItem("lastEmployeeNumber", lastNumber);
+
+      return "KGL" + String(lastNumber).padStart(4, "0");
+    }
+
+    document.getElementById("employeeId").value = generateEmployeeId();
+  </script>
+
+</body>
+</html>

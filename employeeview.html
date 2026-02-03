@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Dashboard | HR System</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#111;color:#fff}
+
+/* NAVBAR */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 40px;
+  background:#000;
+}
+.navbar strong{color:#ff9800}
+
+/* LAYOUT */
+.hero{
+  min-height:100vh;
+  padding:40px 60px;
+}
+
+/* DASHBOARD */
+.wrapper{
+  display:flex;
+  gap:30px;
+  flex-wrap:wrap;
+}
+.box{
+  background:#fff;
+  color:#000;
+  padding:25px;
+  border-radius:8px;
+  box-shadow:0 0 15px rgba(0,0,0,.3);
+  width:420px;
+}
+.table-box{
+  background:#fff;
+  color:#000;
+  padding:20px;
+  border-radius:8px;
+  box-shadow:0 0 15px rgba(0,0,0,.3);
+  width:100%;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  text-align:center;
+}
+th{background:#f1f1f1}
+
+.logout-btn{
+  margin-top:20px;
+  padding:10px 20px;
+  background:#d9534f;
+  border:none;
+  border-radius:5px;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+.logout-btn:hover{background:#c9302c}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <strong>HR SYSTEM</strong>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<section class="hero">
+
+<h2 style="margin-bottom:20px;color:#ff9800">Employee Dashboard</h2>
+
+<div class="wrapper">
+  <div class="box">
+    <h3>Your Information</h3>
+    <p id="empInfo">Loading...</p>
+  </div>
+
+  <div class="table-box">
+    <h3>Your Overtime Records</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Hours</th>
+          <th>OT Pay</th>
+          <th>Total Salary</th>
+        </tr>
+      </thead>
+      <tbody id="empOTTable"></tbody>
+    </table>
+  </div>
+</div>
+
+</section>
+
+<script>
+// LOAD DASHBOARD DATA FROM DATABASE
+function loadDashboard(){
+  const empId = localStorage.getItem("loggedEmployeeId");
+
+  
+  }
+
+  fetch(`http://localhost:8080/api/employee/${empId}`)
+    .then(res=>{
+      if(!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(data=>{
+      document.getElementById("empInfo").innerHTML = `
+        <strong>ID:</strong> ${data.empCode}<br>
+        <strong>Name:</strong> ${data.name}<br>
+        <strong>Phone:</strong> ${data.phone}<br>
+        <strong>Email:</strong> ${data.email}<br>
+        <strong>Department:</strong> ${data.department}<br>
+        <strong>Position:</strong> ${data.position}<br>
+        <strong>Salary:</strong> ${data.salary}
+      `;
+
+      const otTable = document.getElementById("empOTTable");
+      otTable.innerHTML = "";
+
+      if(data.overtime && data.overtime.length > 0){
+        data.overtime.forEach(o=>{
+          otTable.innerHTML += `
+            <tr>
+              <td>${o.date}</td>
+              <td>${o.hours}</td>
+              <td>${o.otPay}</td>
+              <td>${o.totalSalary}</td>
+            </tr>
+          `;
+        });
+      } else {
+        otTable.innerHTML = `
+          <tr><td colspan="4">No overtime records</td></tr>
+        `;
+      }
+    })
+    .catch(()=>{
+      alert("Failed to load employee data");
+    });
+}
+
+// LOGOUT
+function logout(){
+  if(confirm("Are you sure you want to log out?")){
+    localStorage.removeItem("loggedEmployeeId");
+    window.location.href = "login.html";
+  }
+}
+
+// AUTO LOAD
+loadDashboard();
+</script>
+
+</body>
+</html>

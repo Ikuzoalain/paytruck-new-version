@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HR & Payroll System</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#f4f4f4}
+.navbar{display:flex;justify-content:space-between;padding:15px 40px;background:#111;align-items:center}
+.navbar a{color:#fff;text-decoration:none;margin-left:20px;font-weight:bold}
+.navbar button.logout-btn{margin-left:20px;padding:5px 10px;border:none;border-radius:4px;background:#d9534f;color:#fff;font-weight:bold;cursor:pointer}
+.navbar button.logout-btn:hover{background:#c9302c}
+.hero{min-height:100vh;background:#222;padding:40px 60px}
+.tabs{display:flex;gap:10px}
+.tabs button{padding:10px 20px;border:none;border-radius:5px;font-weight:bold;cursor:pointer}
+.tabs .active{background:#ff9800;color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.wrapper{display:flex;gap:30px;margin-top:20px}
+.box{background:#fff;padding:25px;border-radius:8px;box-shadow:0 0 15px rgba(0,0,0,.3);width:420px}
+.box input,select{width:100%;padding:10px;margin-bottom:10px}
+.actions{display:flex;gap:10px}
+.actions button{flex:1;padding:10px;border:none;border-radius:4px;color:#fff;font-weight:bold;cursor:pointer}
+.save{background:#007bff}
+.update{background:#28a745}
+.delete{background:#d9534f}
+.clear{background:#6c757d}
+.table-box{background:#fff;padding:20px;border-radius:8px;box-shadow:0 0 15px rgba(0,0,0,.3);width:100%}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #ddd}
+th{background:#f1f1f1}
+tr:hover{background:#f9f9f9;cursor:pointer}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+<strong style="color:white">HR SYSTEM</strong>
+<nav>
+<a href="home.html">HOME</a>
+<a href="login.html">ADMIN</a>
+<a href="#">EMP-ID</a>
+<button class="logout-btn" onclick="logout()">Logout</button>
+</nav>
+</div>
+
+<section class="hero">
+
+<div class="tabs">
+<button class="active" onclick="showTab('empTab',event)">Employee</button>
+<button onclick="showTab('otTab',event)">Overtime</button>
+</div>
+
+<!-- EMPLOYEE TAB -->
+<div id="empTab" class="tab-content active">
+<div class="wrapper">
+
+<div class="box">
+<h3>Employee Form</h3>
+<input id="employeeId" readonly>
+<input id="firstName" placeholder="First Name">
+<input id="secondName" placeholder="Second Name">
+<input id="phone" placeholder="Phone">
+<input id="email" placeholder="Email">
+<input id="department" placeholder="Department">
+<input id="position" placeholder="Position">
+<input id="salary" type="number" placeholder="Monthly Salary">
+
+<div class="actions">
+<button class="save" onclick="saveEmployee()">Save</button>
+<button class="update" onclick="updateEmployee()">Update</button>
+<button class="delete" onclick="deleteEmployee()">Delete</button>
+<button class="clear" onclick="clearForm()">Clear</button>
+</div>
+</div>
+
+<div class="table-box">
+<h3>Employees</h3>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Pos</th><th>Salary</th></tr></thead>
+<tbody id="empTable"></tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<!-- OVERTIME TAB -->
+<div id="otTab" class="tab-content">
+<div class="wrapper">
+
+<div class="box">
+<h3>Overtime Calculation</h3>
+
+<input type="date" id="otDate">
+<select id="empSelect" onchange="loadEmpOT()"></select>
+
+<input id="otName" readonly>
+<input id="otDept" readonly>
+<input id="otPos" readonly>
+<input id="otSalary" readonly>
+
+<input id="otHours" type="number" placeholder="Overtime Hours" oninput="calcOT()">
+<input id="otPay" placeholder="Overtime Pay" readonly>
+<input id="totalSalary" placeholder="Total Salary" readonly>
+
+<div class="actions">
+<button class="save" onclick="saveOvertime()">Save</button>
+<button class="update" onclick="updateOvertime()">Update</button>
+<button class="delete" onclick="deleteOvertime()">Delete</button>
+<button class="clear" onclick="clearOT()">Clear</button>
+</div>
+</div>
+
+<div class="table-box">
+<h3>Overtime Records</h3>
+
+<!-- Calendar + Search -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+  <div>
+    <label>From:</label><input type="date" id="fromDate" onchange="filterOvertime()">
+    <label>To:</label><input type="date" id="toDate" onchange="filterOvertime()">
+  </div>
+  <div>
+    <input type="text" id="otSearch" placeholder="Search by Name..." oninput="filterOvertime()" style="padding:5px 10px;border-radius:4px;border:1px solid #ccc;">
+  </div>
+</div>
+
+<table>
+<thead><tr><th>Date</th><th>Name</th><th>Hours</th><th>OT Pay</th><th>Total</th></tr></thead>
+<tbody id="otTable"></tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+</section>
+
+<script>
+let empIndex=null, otIndex=null;
+
+function showTab(id,e){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  e.target.classList.add('active');
+}
+
+// Employee ID generation
+function getNextId(){
+  let n = localStorage.getItem("empCounter") || 1;
+  localStorage.setItem("empCounter", n);
+  return "KGL"+String(n).padStart(4,"0");
+}
+function incId(){localStorage.setItem("empCounter", +localStorage.getItem("empCounter")+1)}
+employeeId.value = getNextId();
+
+// Employee CRUD
+function saveEmployee(){
+  let e = JSON.parse(localStorage.getItem("employees"))||[];
+  e.push({id:employeeId.value,f:firstName.value,s:secondName.value,
+         p:phone.value,e:email.value,d:department.value,o:position.value,sa:salary.value});
+  localStorage.setItem("employees", JSON.stringify(e));
+  incId(); employeeId.value=getNextId(); clearForm(); loadEmployees();
+}
+
+function loadEmployees(){
+  let e = JSON.parse(localStorage.getItem("employees"))||[];
+  empTable.innerHTML=""; empSelect.innerHTML="<option>Select Employee</option>";
+  e.forEach((x,i)=>{
+    empTable.innerHTML+=`<tr onclick="selectEmp(${i})">
+      <td>${x.id}</td><td>${x.f} ${x.s}</td><td>${x.d}</td><td>${x.o}</td><td>${x.sa}</td></tr>`;
+    empSelect.innerHTML+=`<option value="${i}">${x.f} ${x.s}</option>`;
+  });
+}
+
+function selectEmp(i){
+  let x = JSON.parse(localStorage.getItem("employees"))[i]; empIndex=i;
+  employeeId.value=x.id; firstName.value=x.f; secondName.value=x.s;
+  phone.value=x.p; email.value=x.e; department.value=x.d;
+  position.value=x.o; salary.value=x.sa;
+}
+
+function updateEmployee(){
+  if(empIndex==null) return;
+  let e = JSON.parse(localStorage.getItem("employees"));
+  e[empIndex] = {id:employeeId.value,f:firstName.value,s:secondName.value,
+                 p:phone.value,e:email.value,d:department.value,o:position.value,sa:salary.value};
+  localStorage.setItem("employees", JSON.stringify(e)); loadEmployees();
+}
+
+function deleteEmployee(){
+  if(empIndex==null) return;
+  let e = JSON.parse(localStorage.getItem("employees"));
+  e.splice(empIndex,1);
+  localStorage.setItem("employees", JSON.stringify(e));
+  clearForm(); loadEmployees();
+}
+
+function clearForm(){
+  document.querySelectorAll('#empTab input').forEach(i=>i.value="");
+  employeeId.value=getNextId(); empIndex=null;
+}
+
+// Overtime calculation
+function calcOT(){
+  if(!otSalary.value || !otHours.value) return;
+  let daily = otSalary.value / 22;
+  let hourly = daily / 8;
+  let otRate = hourly * 1.85;
+  let otAmount = otRate * otHours.value;
+
+  otPay.value = otAmount.toFixed(2);
+  totalSalary.value = (Number(otSalary.value) + otAmount).toFixed(2);
+}
+
+function loadEmpOT(){
+  let e = JSON.parse(localStorage.getItem("employees"))[empSelect.value];
+  if(!e) return;
+  otName.value = e.f+" "+e.s;
+  otDept.value = e.d;
+  otPos.value = e.o;
+  otSalary.value = e.sa;
+  calcOT();
+}
+
+function saveOvertime(){
+  calcOT();
+  let o = JSON.parse(localStorage.getItem("overtime"))||[];
+  o.push({d:otDate.value,n:otName.value,h:otHours.value,p:otPay.value,t:totalSalary.value});
+  localStorage.setItem("overtime", JSON.stringify(o)); loadOvertime();
+}
+
+function loadOvertime(){
+  let o = JSON.parse(localStorage.getItem("overtime"))||[];
+  otTable.innerHTML="";
+  o.forEach((x,i)=>{
+    otTable.innerHTML+=`<tr onclick="selectOT(${i})">
+      <td>${x.d}</td><td>${x.n}</td><td>${x.h}</td><td>${x.p}</td><td>${x.t}</td></tr>`;
+  });
+}
+
+function selectOT(i){
+  let o = JSON.parse(localStorage.getItem("overtime"))[i]; otIndex=i;
+  otDate.value=o.d; otName.value=o.n; otHours.value=o.h;
+  otPay.value=o.p; totalSalary.value=o.t;
+}
+
+function updateOvertime(){
+  if(otIndex==null) return;
+  calcOT();
+  let o = JSON.parse(localStorage.getItem("overtime"));
+  o[otIndex] = {d:otDate.value,n:otName.value,h:otHours.value,p:otPay.value,t:totalSalary.value};
+  localStorage.setItem("overtime", JSON.stringify(o)); loadOvertime();
+}
+
+function deleteOvertime(){
+  if(otIndex==null) return;
+  let o = JSON.parse(localStorage.getItem("overtime"));
+  o.splice(otIndex,1);
+  localStorage.setItem("overtime", JSON.stringify(o));
+  clearOT(); loadOvertime();
+}
+
+function clearOT(){
+  document.querySelectorAll('#otTab input').forEach(i=>i.value="");
+  otIndex=null;
+}
+
+// Filter + search
+function filterOvertime(){
+  let from = fromDate.value, to = toDate.value;
+  let search = otSearch.value.toLowerCase();
+
+  let o = JSON.parse(localStorage.getItem("overtime"))||[];
+  otTable.innerHTML = "";
+
+  o.filter(x => 
+    (!from || x.d >= from) &&
+    (!to || x.d <= to) &&
+    (!search || x.n.toLowerCase().includes(search))
+  ).forEach(x=>{
+    otTable.innerHTML+=`<tr>
+      <td>${x.d}</td><td>${x.n}</td><td>${x.h}</td><td>${x.p}</td><td>${x.t}</td></tr>`;
+  });
+}
+
+// Logout
+function logout(){
+  if(confirm("Are you sure you want to log out?")){
+    window.location.href = "login.html";
+  }
+}
+
+// Init
+loadEmployees(); loadOvertime();
+</script>
+
+</body>
+</html>

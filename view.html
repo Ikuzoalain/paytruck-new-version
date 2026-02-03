@@ -1,0 +1,102 @@
+<?php
+session_start();
+if(!isset($_SESSION['emp_id'])){
+    header("Location: login.php");
+    exit;
+}
+require 'db.php';
+$emp_id = $_SESSION['emp_id'];
+
+// Employee info
+$stmt = $conn->prepare("SELECT * FROM employees WHERE employee_code=?");
+$stmt->bind_param("s", $emp_id);
+$stmt->execute();
+$emp = $stmt->get_result()->fetch_assoc();
+
+// Overtime
+$stmt = $conn->prepare("SELECT * FROM overtime WHERE employee_id=(SELECT id FROM employees WHERE employee_code=?) ORDER BY overtime_date DESC");
+$stmt->bind_param("s", $emp_id);
+$stmt->execute();
+$ot = $stmt->get_result();
+$overtime_records = $ot->fetch_all(MYSQLI_ASSOC);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Employee Dashboard</title>
+<style>
+body{font-family:Arial;background:#f4f4f4;padding:20px;}
+h2{color:#ff9800;}
+.table-box{background:#fff;padding:20px;border-radius:8px;box-shadow:0 0 15px rgba(0,0,0,.3);margin-top:20px;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:10px;border-bottom:1px solid #ddd;text-align:center;}
+th{background:#f1f1f1;}
+tr:hover{background:#f9f9f9;cursor:pointer;}
+input{padding:5px;margin-right:10px;}
+a.logout{color:#fff;background:#d9534f;padding:5px 10px;text-decoration:none;border-radius:4px;}
+a.logout:hover{background:#c9302c;}
+</style>
+</head>
+<body>
+
+<h2>Welcome, <?php echo $emp['first_name'].' '.$emp['second_name']; ?></h2>
+<p>ID: <?php echo $emp['employee_code']; ?> | Dept: <?php echo $emp['department']; ?> | Position: <?php echo $emp['position']; ?> | Salary: <?php echo $emp['salary']; ?></p>
+<a class="logout" href="logout.php">Logout</a>
+
+<div class="table-box">
+<h3>Overtime Records</h3>
+<div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+  <div>
+    <label>From:</label><input type="date" id="fromDate">
+    <label>To:</label><input type="date" id="toDate">
+  </div>
+  <div>
+    <input type="text" id="otSearch" placeholder="Search by Date or Hours">
+  </div>
+</div>
+
+<table id="otTable">
+<thead>
+<tr><th>Date</th><th>Hours</th><th>OT Pay</th><th>Total Salary</th></tr>
+</thead>
+<tbody>
+<?php foreach($overtime_records as $row): ?>
+<tr>
+<td><?php echo $row['overtime_date']; ?></td>
+<td><?php echo $row['overtime_hours']; ?></td>
+<td><?php echo $row['overtime_pay']; ?></td>
+<td><?php echo $emp['salary'] + $row['overtime_pay']; ?></td>
+</tr>
+<?php endforeach; ?>
+</tbody>
+</table>
+</div>
+
+<script>
+// Filter + search
+const otSearch = document.getElementById('otSearch');
+const fromDate = document.getElementById('fromDate');
+const toDate = document.getElementById('toDate');
+const table = document.getElementById('otTable').getElementsByTagName('tbody')[0];
+
+function filterTable(){
+    const search = otSearch.value.toLowerCase();
+    const from = fromDate.value;
+    const to = toDate.value;
+    Array.from(table.rows).forEach(row=>{
+        const date = row.cells[0].textContent;
+        const hours = row.cells[1].textContent;
+        const match = (date.includes(search) || hours.includes(search)) &&
+                      (!from || date>=from) && (!to || date<=to);
+        row.style.display = match ? '' : 'none';
+    });
+}
+
+otSearch.addEventListener('input', filterTable);
+fromDate.addEventListener('change', filterTable);
+toDate.addEventListener('change', filterTable);
+</script>
+
+</body>
+</html>
